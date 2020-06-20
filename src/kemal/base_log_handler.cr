@@ -1,14 +1,9 @@
-require "http"
+module Kemal
+  # All loggers must inherit from `Kemal::BaseLogHandler`.
+  abstract class BaseLogHandler
+    include HTTP::Handler
 
-# All loggers must inherit from `Kemal::BaseLogHandler`.
-class Kemal::BaseLogHandler < HTTP::Handler
-  def initialize
-  end
-
-  def call(context)
-    call_next context
-  end
-
-  def write(message)
+    abstract def call(context : HTTP::Server::Context)
+    abstract def write(message : String)
   end
 end

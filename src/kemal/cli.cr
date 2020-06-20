@@ -3,18 +3,19 @@ require "option_parser"
 module Kemal
   # Handles all the initialization from the command line.
   class CLI
-    def initialize
+    def initialize(args)
       @ssl_enabled = false
       @key_file = ""
       @cert_file = ""
       @config = Kemal.config
-      read_env
-      parse
+      if args
+        parse args
+      end
       configure_ssl
     end
 
-    def parse
-      OptionParser.parse! do |opts|
+    private def parse(args : Array(String))
+      OptionParser.parse args do |opts|
         opts.on("-b HOST", "--bind HOST", "Host to bind (defaults to 0.0.0.0)") do |host_binding|
           @config.host_binding = host_binding
         end
@@ -38,19 +39,17 @@ module Kemal
       end
     end
 
-    def configure_ssl
-      if @ssl_enabled
-        puts "SSL Key Not Found"; exit unless @key_file
-        puts "SSL Certificate Not Found"; exit unless @cert_file
-        ssl = Kemal::Middleware::SSL.new
-        ssl.set_key_file @key_file.not_nil!
-        ssl.set_cert_file @cert_file.not_nil!
-        Kemal.config.ssl = ssl.context
-      end
-    end
-
-    def read_env
-      @config.env = ENV.fetch("KEMAL_ENV", "development")
+    private def configure_ssl
+      {% if !flag?(:without_openssl) %}
+        if @ssl_enabled
+          abort "SSL Key Not Found" if !@key_file
+          abort "SSL Certificate Not Found" if !@cert_file
+          ssl = Kemal::SSL.new
+          ssl.key_file = @key_file.not_nil!
+          ssl.cert_file = @cert_file.not_nil!
+          Kemal.config.ssl = ssl.context
+        end
+      {% end %}
     end
   end
 end

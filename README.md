@@ -1,10 +1,12 @@
-<img src="https://avatars3.githubusercontent.com/u/15321198?v=3&s=200" width="100" height="100" />
-# Kemal [![Build Status](https://travis-ci.org/sdogruyol/kemal.svg?branch=master)](https://travis-ci.org/sdogruyol/kemal)
 
+[![Kemal](https://avatars3.githubusercontent.com/u/15321198?v=3&s=200)](http://kemalcr.com)
+
+# Kemal
+
+Lightning Fast, Super Simple web framework.
+
+[![Build Status](https://travis-ci.org/kemalcr/kemal.svg?branch=master)](https://travis-ci.org/kemalcr/kemal)
 [![Join the chat at https://gitter.im/sdogruyol/kemal](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sdogruyol/kemal?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-Lightning Fast, Super Simple web framework for [Crystal](http://www.crystal-lang.org).
-Inspired by [Sinatra](http://www.sinatrarb.com/) but with superior performance and built-in WebSocket support.
 
 # Super Simple ⚡️
 
@@ -32,26 +34,26 @@ crystal src/kemal_sample.cr
 ```
 Go to *http://localhost:3000*
 
-Check [documentation](http://kemalcr.com) or [samples](https://github.com/sdogruyol/kemal/tree/master/samples) for more.
+Check [documentation](http://kemalcr.com) or [samples](https://github.com/kemalcr/kemal/tree/master/samples) for more.
 
-# Super Fast 🚀
+# Installation
 
-Numbers speak louder than words.
+Add this to your application's `shard.yml`:
 
-| Framework             | Request Per Second  | Avg. Response Time |
-| --------------------- | :-----------------: | -----------------: |
-| Kemal (Production)    | 100238              |           395.44μs |
-| Sinatra (Thin)        | 2274                |            43.82ms |
+```yaml
+dependencies:
+  kemal:
+    github: kemalcr/kemal
+```
 
-
-These results were achieved with ```wrk``` on a Macbook Pro Late 2013. (**2Ghz i7 8GB Ram OS X Yosemite**)
+See also [Getting Started](http://kemalcr.com/guide/).
 
 # Features
 
 - Support all REST verbs
 - Websocket support
 - Request/Response context, easy parameter handling
-- Middlewares
+- Middleware support
 - Built-in JSON support
 - Built-in static file serving
 - Built-in view templating via [Kilt](https://github.com/jeromegn/kilt)

@@ -10,6 +10,15 @@ describe "Kemal::RouteHandler" do
     client_response.body.should eq("hello")
   end
 
+  it "routes should only return strings" do
+    get "/" do
+      100
+    end
+    request = HTTP::Request.new("GET", "/")
+    client_response = call_request_on_app(request)
+    client_response.body.should eq("")
+  end
+
   it "routes request with query string" do
     get "/" do |env|
       "hello #{env.params.query["message"]}"
@@ -76,7 +85,6 @@ describe "Kemal::RouteHandler" do
     post "/" do |env|
       skills = env.params.json["skills"].as(Array)
       skills_from_languages = skills.map do |skill|
-        skill = skill.as(Hash)
         skill["language"]
       end
       "Skills #{skills_from_languages.each.join(',')}"
@@ -94,51 +102,8 @@ describe "Kemal::RouteHandler" do
     client_response.body.should eq("Skills ruby,crystal")
   end
 
-  it "checks for _method param in POST request to simulate PUT" do
-    put "/" do |env|
-      "Hello World from PUT"
-    end
-    request = HTTP::Request.new(
-      "POST",
-      "/",
-      body: "_method=PUT",
-      headers: HTTP::Headers{"Content-Type" => "application/x-www-form-urlencoded"}
-    )
-    client_response = call_request_on_app(request)
-    client_response.body.should eq("Hello World from PUT")
-  end
-
-  it "checks for _method param in POST request to simulate PATCH" do
-    patch "/" do |env|
-      "Hello World from PATCH"
-    end
-    request = HTTP::Request.new(
-      "POST",
-      "/",
-      body: "_method=PATCH",
-      headers: HTTP::Headers{"Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8"}
-    )
-    client_response = call_request_on_app(request)
-    client_response.body.should eq("Hello World from PATCH")
-  end
-
-  it "checks for _method param in POST request to simulate DELETE" do
-    delete "/" do |env|
-      "Hello World from DELETE"
-    end
-    json_payload = {"_method": "DELETE"}
-    request = HTTP::Request.new(
-      "POST",
-      "/",
-      body: "_method=DELETE",
-      headers: HTTP::Headers{"Content-Type" => "application/x-www-form-urlencoded; charset=UTF-8"}
-    )
-    client_response = call_request_on_app(request)
-    client_response.body.should eq("Hello World from DELETE")
-  end
-
   it "can process HTTP HEAD requests for defined GET routes" do
-    get "/" do |env|
+    get "/" do
       "Hello World from GET"
     end
     request = HTTP::Request.new("HEAD", "/")
@@ -153,22 +118,18 @@ describe "Kemal::RouteHandler" do
     request = HTTP::Request.new("GET", "/")
     client_response = call_request_on_app(request)
     client_response.status_code.should eq(302)
+    client_response.body.should eq("")
     client_response.headers.has_key?("Location").should eq(true)
   end
 
-  it "sets default Content-Type to context html" do
+  it "redirects with body" do
     get "/" do |env|
-      "Hello World from GET"
+      env.redirect "/login", body: "Redirecting to /login"
     end
     request = HTTP::Request.new("GET", "/")
     client_response = call_request_on_app(request)
-    client_response.content_type.should eq("text/html")
-  end
-
-  it "sets X-Powered-By to Kemal" do
-    get "/" {}
-    request = HTTP::Request.new("GET", "/")
-    client_response = call_request_on_app(request)
-    client_response.headers["X-Powered-By"].should eq("Kemal")
+    client_response.status_code.should eq(302)
+    client_response.body.should eq("Redirecting to /login")
+    client_response.headers.has_key?("Location").should eq(true)
   end
 end
